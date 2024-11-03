@@ -1,1 +1,1 @@
-https://github.com/geohot/fromthetransistor but for deep learning
+Collection of deep learning model
