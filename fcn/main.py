@@ -5,6 +5,30 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
+CLASSES = 20
+color_map = [
+    (1.0, 0.0, 0.0),    # Red
+    (0.0, 1.0, 0.0),    # Green
+    (0.0, 0.0, 1.0),    # Blue
+    (1.0, 1.0, 0.0),    # Yellow
+    (1.0, 0.0, 1.0),    # Magenta
+    (0.0, 1.0, 1.0),    # Cyan
+    (0.5, 0.5, 0.0),    # Olive
+    (0.5, 0.0, 0.5),    # Purple
+    (0.0, 0.5, 0.5),    # Teal
+    (0.5, 0.5, 0.5),    # Gray
+    (1.0, 0.5, 0.0),    # Orange
+    (0.5, 1.0, 0.0),    # Lime Green
+    (0.0, 0.5, 1.0),    # Sky Blue
+    (1.0, 0.0, 0.5),    # Pink
+    (0.5, 0.0, 1.0),    # Deep Purple
+    (0.0, 1.0, 0.5),    # Aquamarine
+    (0.75, 0.75, 0.0),  # Mustard Yellow
+    (0.75, 0.0, 0.75),  # Violet
+    (0.0, 0.75, 0.75),  # Turquoise
+    (0.25, 0.25, 0.25)  # Dark Gray
+]
+
 class DataLoader:
     #128x256
     def __init__(self, path, size):
@@ -12,17 +36,20 @@ class DataLoader:
         self.data = [None] * size
         self.size = size
     def __getitem__(self, index):
-        if self.data[index]: return self.data[index]
+        with torch.no_grad():
+            if self.data[index]: return self.data[index]
 
-        npimg = np.moveaxis(np.load(f"{self.path}/image/{index}.npy"), -1, 0)
-        image = torch.from_numpy(npimg)
+            npimg = np.moveaxis(np.load(f"{self.path}/image/{index}.npy"), -1, 0)
+            image = torch.from_numpy(npimg)
 
-        npsem = np.moveaxis(np.load(f"{self.path}/label/{index}.npy"), -1, 0)
-        sem = torch.from_numpy(npsem)
-        print("lksjdf", sem.shape)
+            npsem = np.moveaxis(np.load(f"{self.path}/label/{index}.npy"), -1, 0)
+            sem = torch.from_numpy(npsem)
+            semTens = torch.zeros((CLASSES, 256, 128))
 
-        self.data[index] = {"img": image.float().unsqueeze(0), "sem": sem.float().unsqueeze(0)}
-        return self.data[index]
+            for i in range(CLASSES): semTens[i] = (sem == i)
+
+            self.data[index] = {"img": image.float().unsqueeze(0), "sem": semTens.float().unsqueeze(0)}
+            return self.data[index]
 
 class FCN(nn.Module):
     def __init__(self, preModel):
@@ -45,19 +72,33 @@ class FCN(nn.Module):
             nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1),
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(32),
-            nn.Conv2d(32, 20, kernel_size=1),  #instead of rgb we have 20 channels
+            nn.ConvTranspose2d(
+                in_channels=32, 
+                out_channels=20, 
+                kernel_size=(4, 4),
+                stride=(3, 3),
+                padding=(1, 1)
+            ),
+            nn.ReLU(inplace=True),
+            nn.BatchNorm2d(20),
+            nn.AdaptiveAvgPool2d((256, 128)),
         )
     def forward(self, x):
         x = self.preModel.forward(x)
         return self.model.forward(x)
 
-def showImageAndSem(img):
-    sem = img["sem"]
-    img = img["img"]
+def showImageAndSem(img, sem):
+    semImg = np.zeros((128, 256 ,3))
+    semTen = sem.permute(0, 2, 1).detach().numpy()
+    for i in range(CLASSES):
+        r,g,b = color_map[i]
+        semImg[..., 0] += semTen[i] * r
+        semImg[..., 1] += semTen[i] * g
+        semImg[..., 2] += semTen[i] * b
     plt.subplot(1,3,1)
-    plt.imshow(img.permute(1, 2, 0))
+    plt.imshow(img.permute(2, 3, 1, 0).squeeze(3))
     plt.subplot(1,3,2)
-    plt.imshow(sem.T)
+    plt.imshow(semImg)
     plt.show()
 
 def main():
@@ -67,7 +108,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("DEVICE:", device)
     model = FCN(alexnet)
-    if os.path.exists("model.pt"): model.load_state_dict(torch.load("model.pt", weights_only=True))
+    #if os.path.exists("model.pt"): model.load_state_dict(torch.load("model.pt", weights_only=True))
     model.to(device)
     lossFunc = nn.BCEWithLogitsLoss()
     optim = torch.optim.Adam(model.parameters(), lr=0.01)
@@ -76,10 +117,11 @@ def main():
     try:
         for epoch in range(EPOCH):
             for i in range(trainData.size):
-                input, truth = trainData[i]["img"], trainData[i]["sem"].T
+                input, truth = trainData[i]["img"], trainData[i]["sem"]
                 optim.zero_grad()
                 preds = model(input.to(device))
                 preds = preds.cpu()
+                showImageAndSem(input, preds.squeeze(0))
                 loss = lossFunc(preds, truth)
                 loss.backward()
                 optim.step()

@@ -6,3 +6,5 @@ Make convolution operation cheaper by factoring the convolution operation over m
 NOTE_TO_SELF:
 maybe if i had used softmax in the end, my training would have been easier?
 Cross entropy loss function compares 2 probability distribution, hence when 1(ground truth) is in between 0 and 1, keeping other also between 0 and 1 would be better.
+
+TRAINED_MODEL: https://huggingface.co/0VISH0/Mobile-Net
