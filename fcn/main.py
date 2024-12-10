@@ -1,8 +1,8 @@
 import torch.nn as nn
 import torchvision.models as models
 import torch
-import numpy as np
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 
 CLASSES = 20
@@ -101,18 +101,33 @@ def showImageAndSem(img, sem):
     plt.imshow(semImg)
     plt.show()
 
+def test(model):
+    assert os.path.exists("model.pt")
+    testData = DataLoader("../data/fcn/val", 500)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if model is None:
+        alexnet = models.alexnet(weights = models.AlexNet_Weights.DEFAULT)
+        model = FCN(alexnet)
+        model.load_state_dict(torch.load("model.pt", weights_only=True))
+    model.to(device)
+    with torch.no_grad():
+        for i in range(testData.size):
+            input, truth = testData[i]["img"], testData[i]["sem"]
+            preds = model(input.to(device))
+            preds = preds.cpu()
+            showImageAndSem(input, preds.squeeze(0))
+
 def main():
     trainData = DataLoader("../data/fcn/train", 2975)
-    testData = DataLoader("../data/fcn/val", 500)
     alexnet = models.alexnet(weights = models.AlexNet_Weights.DEFAULT)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("DEVICE:", device)
     model = FCN(alexnet)
-    #if os.path.exists("model.pt"): model.load_state_dict(torch.load("model.pt", weights_only=True))
+    if os.path.exists("model.pt"): model.load_state_dict(torch.load("model.pt", weights_only=True))
     model.to(device)
-    lossFunc = nn.BCEWithLogitsLoss()
+    lossFunc = nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters(), lr=0.01)
-    EPOCH = 10
+    EPOCH = 100
     runningLoss = 0
     try:
         for epoch in range(EPOCH):
@@ -121,7 +136,6 @@ def main():
                 optim.zero_grad()
                 preds = model(input.to(device))
                 preds = preds.cpu()
-                showImageAndSem(input, preds.squeeze(0))
                 loss = lossFunc(preds, truth)
                 loss.backward()
                 optim.step()
@@ -131,6 +145,6 @@ def main():
                     runningLoss = 0
     except KeyboardInterrupt: print("Exiting training...")
     finally: torch.save(model.state_dict(), "model.pt")
-
+    test(model)
 
 if __name__ == "__main__": main()
