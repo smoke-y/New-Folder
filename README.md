@@ -21,15 +21,13 @@ $MSE(x) = \frac{1}{n}\sum({y* - y})^2 = E$<br>
 where $y*$ is truth
 
 Backward pass:<br>
-$
-\frac{\partial E}{\partial y} = -(y*-y)\\
+$\frac{\partial E}{\partial y} = -(y*-y)\\
 \frac{\partial y}{\partial d} = f(d)(1-f(d))\\
 \frac{\partial E}{\partial d} = \frac{\partial E}{\partial y}\frac{\partial y}{\partial d}\\
 \frac{\partial d}{\partial w} = x\\
 \frac{\partial E}{\partial w} = \frac{\partial E}{\partial d}\frac{\partial d}{\partial w} = \frac{\partial E}{\partial d}x\\
 \frac{\partial d}{\partial b} = 1\\
-\frac{\partial E}{\partial w} = \frac{\partial E}{\partial d}\frac{\partial d}{\partial b} = \frac{\partial E}{\partial d}
-$
+\frac{\partial E}{\partial w} = \frac{\partial E}{\partial d}\frac{\partial d}{\partial b} = \frac{\partial E}{\partial d}$
 
 # Optimizer
 Now that we have calculated gradient, we can simply reduce the loss by updating the parameters.
@@ -37,24 +35,18 @@ Now that we have calculated gradient, we can simply reduce the loss by updating 
 $p_t = p_{t-1} - \alpha G$ where $\alpha$ is the learning rate(hyperparameter: set before training and usually does not change while training).
 and $G$ is the gradient. The stochastic in stochastic gradient descent refers to random sampling of data from the dataset inorder to calculate gradient.
 ### SGD with momentum
-$
-v_t = \beta v_{t-1} + (1-\beta)G\\
-p_t = p_{t-1} - \alpha v_t
-$<br>
+$v_t = \beta v_{t-1} + (1-\beta)G\\
+p_t = p_{t-1} - \alpha v_t$<br>
 By keeping track of the general direction of the descent, any noise present in the dataset won't cause a "shock" to the model.
 ### RMSprop
-$
-v_t = \beta v_{t-1} + (1-\beta)G^2\\
-p_t = p_{t-1} - \alpha \frac{G}{\sqrt{v_t} + \epsilon}
-$
+$v_t = \beta v_{t-1} + (1-\beta)G^2\\
+p_t = p_{t-1} - \alpha \frac{G}{\sqrt{v_t} + \epsilon}$
 This allows for an adaptive learning rate. If the gradient is large, the step size is small and vice verca.
 Adagrad is another optimizer that looks similar to the above except $v_t = v_{t-1} + G^2$. This results in a diminishing lr.
 ### Adam
 Adam optimizer combines momentum and adaptive lr idea. <br>
-$
-m_t = \beta_1 m_{t-1} + (1-\beta_1)G\\
+$m_t = \beta_1 m_{t-1} + (1-\beta_1)G\\
 v_t = \beta_2 v_{t-1} + (1-\beta_2)G^2\\
-p_t = p_{t-1} - \alpha \frac{m_t}{\sqrt{v_t} + \epsilon}\\
-$
+p_t = p_{t-1} - \alpha \frac{m_t}{\sqrt{v_t} + \epsilon}\\$
 
 # Normalization
