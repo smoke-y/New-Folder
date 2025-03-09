@@ -29,6 +29,15 @@ $\frac{\partial E}{\partial w} = \frac{\partial E}{\partial d}\frac{\partial d}{
 $\frac{\partial d}{\partial b} = 1$<br>
 $\frac{\partial E}{\partial w} = \frac{\partial E}{\partial d}\frac{\partial d}{\partial b} = \frac{\partial E}{\partial d}$<br>
 
+# Regularization
+### L1 regularization
+$loss = lossFunction + \sum W$<br>
+This penalizes when the weights are high, and can drive the weights of few neurons to zero.
+### L2 regularization
+$loss = lossFunction + \sum W^2$<br>
+This also penalizes when the weights are high, and can drive the weights of few neurons to NEAR zero, but never zero.
+Imagine loss function to be of some shape in a 2d(i.e. 2 parameters. Usually its higher dimension) space. Now $W^2$ is a circle at origin and the intersection between the circle and the loss function is the solution which the model will converge to. But if it is $W$, then we have a square whose each vertex is on an axis. Hence, the value that the model will converge to is when one of the weights are 0.
+
 # Optimizer
 Now that we have calculated gradient, we can simply reduce the loss by updating the parameters.
 ### SGD
@@ -50,3 +59,9 @@ $v_t = \beta_2 v_{t-1} + (1-\beta_2)G^2$<br>
 $p_t = p_{t-1} - \alpha \frac{m_t}{\sqrt{v_t} + \epsilon}$<br>
 
 # Normalization
+### Layer normalization
+$var(x) = \frac{\sum(x-\bar x)^2}{N}$<br>
+$x = \frac{x - \bar x}{var(x) + \epsilon}$<br>
+Layer normalization helps the model to find the underlying pattern in the data irrespective of how rotated, skewed, streched, etc... it is.
+### Batch normalization
+The above equations are now applied in the batch dimension of the tensor. This smoothens the loss landscape and makes it easier to navigate. If one of the inputs in a batch is noisy, batch normalization smoothens it out.
