@@ -65,3 +65,14 @@ $x = \frac{x - \bar x}{var(x) + \epsilon}$<br>
 Layer normalization helps the model to find the underlying pattern in the data irrespective of how rotated, skewed, streched, etc... it is.
 ### Batch normalization
 The above equations are now applied in the batch dimension of the tensor. This smoothens the loss landscape and makes it easier to navigate. If one of the inputs in a batch is noisy, batch normalization smoothens it out.
+
+# Transformer
+Helps pass data from 1 vector to another vector when required.<br>
+We multiply the embedding with 3 matrix to get $Q,K,V$.<br>
+$Q$: This asks a question<br>
+$K$: This raises its hand and says "Hey I have the answer!"<br>
+We take $softmax(QK)$ inorder to get a normalized heatmap and finally multiply $V$ to deliver the information. $softmax(QK)$ tells us where to look, but it is $V$ that delivers the required information.<br>
+$attention = softmax(\frac{QK^T}{\sqrt d})V$<br>
+In multi head attention, we divide the embedding into $\frac{d}{nheads}$ chunks and apply attention on each of these chunks. Think of it as a team of specialists. The team of specialist are working on parts of the project instead of the entire project.
+
+The nlp layer after the attention helps information to flow within embeddings itself.

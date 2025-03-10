@@ -4,6 +4,19 @@ $P(A,B) = P(A|B)P(B)$<br>
 $expectation = \sum xP(x)$<br>
 $KL \space divergence = KL(P||Q) = \sum P(x)\log\frac{P(x)}{Q(x)}$
 
+# Metric
+$precision = \frac{true positive}{true positive + false positive}$<br>
+$recall = \frac{true positive}{true positive + false negative}$<br>
+$F1 = 2\frac{precision*recall}{precision+recall}$
+
+# Methods
+### Cross-Validation
+Keep splitting the dataset and training and testing it on the new split.
+### Ensemble
+Combine weaker models to create a stronger model.<br>
+Bagging: trains multiple models on different parts of the data and aggregates the results. Example: Random forest
+Boosting: trains models sequentlially where each model focuses on correcting the errors of the previous model.
+
 # Linear regression
 $y = mx + b$ where $m, b$ is slope and y-intercept respectively. This is an equation of a line and will capture any linear relationship between x and y.
 
