@@ -1,3 +1,9 @@
+# Probability
+$bayes \space theorem = P(A|B) = \frac{P(B|A)P(A)}{P(B)}$<br>
+$P(A,B) = P(A|B)P(B)$<br>
+$expectation = \sum xP(x)$<br>
+$KL \space divergence = KL(P||Q) = \sum P(x)\log\frac{P(x)}{Q(x)}$
+
 # Linear regression
 $y = mx + b$ where $m, b$ is slope and y-intercept respectively. This is an equation of a line and will capture any linear relationship between x and y.
 
@@ -40,7 +46,12 @@ Consider we are on hyperplane. Take k steps to positive line. Hence, <br>
 $wx - b=0$<br>
 $w(x+k\frac{w}{\rVert w \rVert})- b=1$<br>
 $k=\frac{1}{\rVert w \rVert}$<br>
-Hence we have to $minimize(\rVert w \rVert)$ subjected to $y(wx-b) \geq 1$
+Hence we have to $minimize(\rVert w \rVert)$ subjected to $y(wx+b) \geq 1$<br>
+We are going to introduce a slack variable $\epsilon$ as in real world the usuallly data is not hard margin seperable.<br>
+$y(wx+b) \geq 1 - \epsilon$<br>
+$\epsilon \geq 1 - y(wx+b)$<br>
+$\epsilon = max(0,1 - y(wx+b))$<br>
+This is the loss used in SVM.
 ### Kernel trick
 The above works only for linear relationship. For non-linear we have to apply the kernel trick.
 Instead of transforming each data point to a higher space and applying non linear function, we just apply the kernel directly to the data, saving computation and space, generating new datapoints that can be linearly seperated.
