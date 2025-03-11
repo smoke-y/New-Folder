@@ -9,6 +9,10 @@ $precision = \frac{true positive}{true positive + false positive}$<br>
 $recall = \frac{true positive}{true positive + false negative}$<br>
 $F1 = 2\frac{precision*recall}{precision+recall}$
 
+Precision is used when false positives are expensive such as fire alarms.
+Recall is used when false negatives are expensive such as cancer treatments.
+F1 gives a good balance between the two.
+
 # Methods
 ### Cross-Validation
 Keep splitting the dataset and training and testing it on the new split.
@@ -63,7 +67,7 @@ Hence we have to $minimize(\rVert w \rVert)$ subjected to $y(wx+b) \geq 1$<br>
 We are going to introduce a slack variable $\epsilon$ as in real world the usuallly data is not hard margin seperable.<br>
 $y(wx+b) \geq 1 - \epsilon$<br>
 $\epsilon \geq 1 - y(wx+b)$<br>
-$\epsilon = max(0,1 - y(wx+b))$<br>
+$loss = max(0,1 - y(wx+b))$<br>
 This is the loss used in SVM.
 ### Kernel trick
 The above works only for linear relationship. For non-linear we have to apply the kernel trick.
