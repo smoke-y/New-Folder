@@ -79,3 +79,8 @@ KNN picks the k closest nearest neighbors to the current data and makes them vot
 
 # K-Means Clustering
 Assing k centroids randomly. For each points mark the closest centroid. Update the centroid by taking average distance of respective marked centroids. Keep doing this until centroids don't move. This is an unsupervised algorithm.
+
+### Elbow method
+This algorithm helps us find optimal k. We start from 1 and keep going until we notice that adding k doesn't improve Within Cluster Sum of Square(WCSS) score.<br>
+$WCSS = \sum_{i=0} ^ k \sum_{j=0} ^ C ||x - \mu_i ||^2$<br>
+Where $C$ are all the points assigned to the centroid $\mu_i$
