@@ -24,12 +24,12 @@ class Tokenizer:
         for pair in zip(tokens, tokens[1:]): count[pair] = count.get(pair,0) + 1
         return count
     def train(self, trainText: str) -> None:
-        trainText = trainText.encode("utf-8")
-        tokens = list(map(int, trainText))
+        trainTextd = trainText.encode("utf-8")
+        tokens = list(map(int, trainTextd))
         merges = {}
         for i in range(self.numMerges):
             stats = self.getStats(tokens)
-            pair = max(stats, key=stats.get)
+            pair = max(stats, key=lambda k: stats.get(k, 0))
             id = 256+i
             print(f"[+] {pair} -> {id}")
             tokens = self.merge(tokens, pair, id)
@@ -47,8 +47,8 @@ class Tokenizer:
             tokens = self.merge(tokens, pair, self.merges[pair])
         return tokens
     def decode(self, tokens: list) -> str:
-        tokens = b"".join(self.vocab[idx] for idx in tokens)
-        text = tokens.decode("utf-8", errors="replace")
+        tokensd = b"".join(self.vocab[idx] for idx in tokens)
+        text = tokensd.decode("utf-8", errors="replace")
         return text
 trainText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in mi mauris. Phasellus consectetur risus sem, et varius metus cursus tincidunt. Fusce pellentesque purus felis, quis tincidunt velit egestas eu. Pellentesque sagittis odio ut turpis volutpat, fringilla feugiat orci lacinia. Duis ut vehicula urna. Integer porttitor, massa ut consectetur maximus, lacus mauris gravida metus, eu consequat est ligula ut eros. Curabitur non malesuada velit, tempus aliquam mauris. Vestibulum leo turpis, tempus non dapibus et, fringilla eget augue. Sed tempus iaculis condimentum. Aenean non lacinia libero, vel lacinia ex. Nam venenatis metus in neque mollis dignissim."
 
